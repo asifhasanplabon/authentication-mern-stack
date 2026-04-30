@@ -29,9 +29,10 @@ export const register = asyncHandler(async(req,res)=>{
     const expiresAt = new Date(Date.now() + 10 * 60* 1000); //10min
     await Otp.deleteMany({email, type: 'verify'});
     await Otp.create({ email, otp, type:"verify", expiresAt});
-    await sendOtpEmail(email,otp,'verify');
+sendOtpEmail(email, otp, 'verify')
+  .catch(err => console.log("OTP email error:", err));
 
-    res.status(201).json({message: 'Registered! Checked the email for verifications'});
+    return res.status(201).json({message: 'Registered! Checked the email for verifications'});
 });  
 
 // @route POST /api/auth/verify-otp
