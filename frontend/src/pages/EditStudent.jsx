@@ -55,7 +55,7 @@ export default function EditStudent() {
           <div style={{ marginBottom: 16 }}>
             <label style={{ display: 'block', marginBottom: 6, fontWeight: 500, fontSize: 14 }}>Gender</label>
             <select value={form.gender} onChange={e => setForm({ ...form, gender: e.target.value })} style={inputStyle}>
-              <option>Male</option><option>Female</option><option>Other</option>
+              <option>Male</option><option>Female</option>
             </select>
           </div>
           <div style={{ marginBottom: 16 }}>

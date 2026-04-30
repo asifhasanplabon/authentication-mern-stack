@@ -19,33 +19,39 @@ export const getStudent = asyncHandler(async (req, res) => {
 // @route PUT /api/students/:id
 export const updateStudent = asyncHandler(async (req, res) => {
   const student = await User.findById(req.params.id);
-  if (!student) { res.status(404); throw new Error('Student not found'); }
 
-  // Only admin or the student themselves can update
-  if (req.user.role !== 'admin' && req.user._id.toString() !== req.params.id) {
-    res.status(403); throw new Error('Not authorized');
+  if (!student) {
+    res.status(404);
+    throw new Error('Student not found');
   }
 
-  // Update photo on cloudinary if new one uploaded
-  let photoUrl = student.photo;
-  if (req.file) {
-    if (student.photo) {
-      const publicId = student.photo.split('/').slice(-2).join('/').split('.')[0];
-      await cloudinary.uploader.destroy(publicId);
-    }
-    photoUrl = req.file.path;
+  if (
+    req.user.role !== 'admin' &&
+    req.user._id.toString() !== req.params.id
+  ) {
+    res.status(403);
+    throw new Error('Not authorized');
   }
 
   const { name, gender, session, dept, phone } = req.body;
-  student.name    = name    || student.name;
-  student.gender  = gender  || student.gender;
-  student.session = session || student.session;
-  student.dept    = dept    || student.dept;
-  student.phone   = phone   || student.phone;
-  student.photo   = photoUrl;
+
+  student.name = name ?? student.name;
+  student.gender = gender ?? student.gender;
+  student.session = session ?? student.session;
+  student.dept = dept ?? student.dept;
+  student.phone = phone ?? student.phone;
+
+  // 💥 SAFE IMAGE HANDLING
+  if (req.file && req.file.path) {
+    student.photo = req.file.path;
+  }
 
   const updated = await student.save();
-  res.json({ message: 'Updated successfully', student: updated });
+
+  res.json({
+    message: 'Updated successfully',
+    student: updated
+  });
 });
 
 // @route DELETE /api/students/:id   (admin only)

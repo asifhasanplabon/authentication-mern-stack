@@ -24,7 +24,7 @@ export default function Login() {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 20px' }}>
+    <div style={{ maxWidth: 400, margin: '80px auto', padding: '0 20px',border: '1px solid black' , }}>
       <div style={{ background: 'var(--color-background-secondary)', borderRadius: 12,
                     padding: 32, border: '1px solid var(--color-border-tertiary)' }}>
         <h2 style={{ marginBottom: 24 }}>Login — JKKNIU LMS</h2>

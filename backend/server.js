@@ -17,7 +17,13 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: "https://authentication-mern-stack-roan.vercel.app",
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 

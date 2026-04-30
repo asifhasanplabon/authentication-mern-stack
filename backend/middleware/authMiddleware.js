@@ -21,7 +21,7 @@ export const protect = asyncHandler(async(req,res, next)=>{
 });
 
 export const adminOnly =(req, res, next) =>{
-    if(req.user?.role==="admin") return next();
+    if(req.user?.role==="admin" ) return next();
     res.status(403);
     throw new Error('Admin access only');
 };

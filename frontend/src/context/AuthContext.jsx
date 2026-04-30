@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import api from '../api/axios';
+import { createContext, useContext, useState, useEffect } from "react";
+import api from "../api/axios";
 
 const AuthContext = createContext(null);
 
@@ -7,33 +7,42 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // 🔥 Load user on refresh
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
 
-    if (!token) {
+    if (!token || token === "undefined") {
       setLoading(false);
       return;
     }
 
-    api.get('/auth/me')
-      .then(res => {
+    api
+      .get("/auth/me")
+      .then((res) => {
         console.log("AUTH USER:", res.data);
         setUser(res.data.user || res.data);
       })
       .catch((err) => {
-        console.error("AUTH ERROR:", err);
-        localStorage.removeItem('token');
+        console.error("AUTH ERROR:", err.response?.data || err.message);
+        localStorage.removeItem("token");
+        setUser(null);
       })
       .finally(() => setLoading(false));
   }, []);
 
+  // 🔥 LOGIN
   const login = (token, userData) => {
-    localStorage.setItem('token', token);
+    console.log("LOGIN TOKEN:", token);
+
+    if (!token || token === "undefined") return;
+
+    localStorage.setItem("token", token);
     setUser(userData);
   };
 
+  // 🔥 LOGOUT
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setUser(null);
   };
 

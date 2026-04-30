@@ -95,7 +95,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   if (!user) { res.status(404); throw new Error('No user with that email'); }
 
   const otp = makeOtp();
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  const expiresAt = new Date(Date.now() + 20 * 60 * 1000);
   await Otp.deleteMany({ email, type: 'reset' });
   await Otp.create({ email, otp, type: 'reset', expiresAt });
   await sendOtpEmail(email, otp, 'reset');
@@ -105,19 +105,41 @@ export const forgotPassword = asyncHandler(async (req, res) => {
 
 // @route POST /api/auth/reset-password
 export const resetPassword = asyncHandler(async (req, res) => {
-  const { email, otp, newPassword } = req.body;
-  const record = await Otp.findOne({ email, otp, type: 'reset' });
 
-  if (!record || record.expiresAt < new Date()) {
-    res.status(400); throw new Error('Invalid or expired OTP');
+  let { email, otp, newPassword } = req.body;
+
+  email = email.trim().toLowerCase();
+  otp = otp.trim();
+
+  const record = await Otp.findOne({
+    email,
+    otp,
+    type: "reset"
+  });
+
+  if (!record) {
+    res.status(400);
+    throw new Error("Invalid OTP");
+  }
+
+  if (record.expiresAt < new Date()) {
+    res.status(400);
+    throw new Error("OTP expired");
   }
 
   const user = await User.findOne({ email });
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
   user.password = newPassword;
   await user.save();
-  await Otp.deleteMany({ email, type: 'reset' });
 
-  res.json({ message: 'Password reset successful. Please log in.' });
+  await Otp.deleteMany({ email, type: "reset" });
+
+  res.json({ message: "Password reset successful" });
 });
 
 // @route GET /api/auth/me
